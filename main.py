@@ -48,13 +48,26 @@ async def on_ready():
             response = str(result)
             responseSplit =response.split()
             reversedList = []
+            nameList = []
             for value in responseSplit:
                 reversedList = [value] + reversedList
-
-            if reversedList[0] =="'fleaMarket'}]}]}}":
-                botResponse = str("The price on the Flea market for "+ input +" is "+ (reversedList[2]))
-                await message.channel.send(botResponse)
+            if responseSplit[2] =="[{'name':":
+                x=3
+                for x in range(3,10):
+                    if responseSplit[x]=="'sellFor':":
+                        break
+                    else:
+                        nameList.append(responseSplit[x])
+                if reversedList[0] =="'fleaMarket'}]}]}}":
+                    botResponse = str("The price on the Flea market for "+ " ".join(nameList) +" is "+ (reversedList[2]))
+                    await message.channel.send(botResponse)
+                else:
+                    await message.channel.send("That item is not on the Flea Market or a skill issue ocurred")
             else:
-                await message.channel.send("That item is not on the Flea Market or a skill issue ocurred")
+                if reversedList[0] =="'fleaMarket'}]}]}}":
+                    botResponse = str("The price on the Flea market for "+ input +" is "+ (reversedList[2]))
+                    await message.channel.send(botResponse)
+                else:
+                    await message.channel.send("That item is not on the Flea Market or a skill issue ocurred")
     
 client.run('MTE0NjAwMTI4NTY5MTIzMjI5Ng.G4G44c.ugqWlO1-g-f9eQMHJjHLmcCkv-SivTVbV_LB6Q')
