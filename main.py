@@ -70,4 +70,4 @@ async def on_ready():
                 else:
                     await message.channel.send("That item is not on the Flea Market or a skill issue ocurred")
     
-client.run('MTE0NjAwMTI4NTY5MTIzMjI5Ng.G4G44c.ugqWlO1-g-f9eQMHJjHLmcCkv-SivTVbV_LB6Q')
+client.run('your token here')
