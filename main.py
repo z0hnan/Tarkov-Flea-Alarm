@@ -23,14 +23,14 @@ def run_query(query):
         raise Exception("Query failed to run by returning code of {}. {}".format(response.status_code, query))
 
 async def ping(message,msgSplit, pingCounter):
-    myChannel = client.get_channel(846123908683661322)
+    myChannel = message.channel
     nameList = []
-    x=1
-    for x in range(msgSplit.length):
+    for x in range(len(msgSplit)):
         if msgSplit[x] == "<" or msgSplit[x]==">":
             break
         else:
-            nameList.append(msgSplit[x])
+            if msgSplit[x] != "Ping":
+                nameList.append(msgSplit[x])
     input =" ".join(nameList)
     if pingCounter > 48:
         await myChannel.send(f'The ping limit has been reached for "{input}", the ping limit is 48 hours')
@@ -53,18 +53,18 @@ async def ping(message,msgSplit, pingCounter):
     reversedList = []
     for x in responseSplit:
         reversedList = [x] + reversedList
-
-    if msgSplit[nameList.length + 1] == "<":
-        if reversedList[2] < int(msgSplit[nameList.length + 2]):
-            botResponse = str("<@" + str(message.author) + ">" + "The price on the Flea market for "+ input +" is now "+ (reversedList[2]))
+    
+    if msgSplit[len(nameList) + 1] == "<":
+        if float(reversedList[2][:-1]) < int(msgSplit[len(nameList) + 2]):
+            botResponse = str("<@" + str(message.author.id) + ">" + " The price on the Flea market for "+ input +" is now "+ (reversedList[2]))
             await message.channel.send(botResponse)
         else:
             pingCounter = pingCounter + 1
             await asyncio.sleep(3600)
             await ping(message,msgSplit, pingCounter)
-    elif msgSplit[nameList.length + 1] == ">":
-        if reversedList[2] > int(msgSplit[nameList.length + 2]):
-            botResponse = str("<@" + str(message.author) + ">" + "The price on the Flea market for "+ input +" is now "+ (reversedList[2]))
+    elif msgSplit[len(nameList) + 1] == ">":
+        if float(reversedList[2][:-1]) > int(msgSplit[len(nameList) + 2]):
+            botResponse = str("<@" + str(message.author.id) + ">" + " The price on the Flea market for "+ input +" is now "+ (reversedList[2]))
             await message.channel.send(botResponse)
         else:
             pingCounter = pingCounter + 1
@@ -136,4 +136,4 @@ async def on_ready():
             await ping(message,msgSplit, pingCounter)
 
 #Add your discord bot token    
-client.run('MTE0NjAwMTI4NTY5MTIzMjI5Ng.G4fRd7.SP126XQH3FkvUCXvphwgexfn3j7_xGAoWsSgtg')
+client.run('---your token here---')
