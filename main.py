@@ -32,8 +32,8 @@ async def ping(message,msgSplit, pingCounter):
             if msgSplit[x] != "Ping":
                 nameList.append(msgSplit[x])
     input =" ".join(nameList)
-    if pingCounter > 48:
-        await myChannel.send(f'The ping limit has been reached for "{input}", the ping limit is 48 hours')
+    if pingCounter > 96:
+        await myChannel.send(f'The ping limit has been reached for "{input}", the tracking limit is 48 hours')
         pingCounter = 0
         return
     new_query = f"""
@@ -60,7 +60,7 @@ async def ping(message,msgSplit, pingCounter):
             await message.channel.send(botResponse)
         else:
             pingCounter = pingCounter + 1
-            await asyncio.sleep(3600)
+            await asyncio.sleep(1800)
             await ping(message,msgSplit, pingCounter)
     elif msgSplit[len(nameList) + 1] == ">":
         if float(reversedList[2][:-1]) > int(msgSplit[len(nameList) + 2]):
@@ -68,7 +68,7 @@ async def ping(message,msgSplit, pingCounter):
             await message.channel.send(botResponse)
         else:
             pingCounter = pingCounter + 1
-            await asyncio.sleep(3600)
+            await asyncio.sleep(1800)
             await ping(message,msgSplit, pingCounter)
     else:
         await message.channel.send("Invalid input please use this format: Ping *item name* < or > *price* for example: Ping Metal Fuel < 1000")
