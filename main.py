@@ -164,4 +164,4 @@ async def on_ready():
             await ping(message,msgSplit, pingCounter)
 
 #Add your discord bot token    
-client.run('MTE0NjAwMTI4NTY5MTIzMjI5Ng.GAodA7.AD2j28bwKzOLjQZX07oexw-xOPZqcPquzw4kXY')
+client.run('---YOUR BOT TOKEN HERE---')
