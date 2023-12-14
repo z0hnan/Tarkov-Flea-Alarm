@@ -7,11 +7,9 @@ import json
 #Declare variable so it isn't null
 input = ""
 
-
 #Discord bot settings
 intents = discord.Intents.all()
 client = discord.Client(command_prefix='!', intents=intents,activity=discord.Game(name='Escape from Tarkov'))
-
 
 #Define API request
 def run_query(query):
@@ -71,7 +69,6 @@ async def handleMsg(message,msgSplit):
         await message.channel.send(botResponse)
     else:
         await message.channel.send("That item is not on the Flea Market or a skill issue ocurred")
-
 
 async def ping(message,msgSplit, pingCounter):
     myChannel = message.channel
@@ -153,30 +150,37 @@ async def ping(message,msgSplit, pingCounter):
     else:
         await message.channel.send("Invalid input please use this format: Ping *item name* < or > *price* for example: Ping Metal Fuel < 1000")
 
-
+tracked_servers = set()
 #On Log in
 @client.event
 async def on_ready():
     pingCounter = 0
     print('Logged in as {0.user}'.format(client))
+    print('Connected to servers:')
+    for guild in client.guilds:
+        tracked_servers.add(guild.id)
+        print(guild.name)
+    
     #Bot recieves message
     @client.event
     async def on_message(message):
         if message.author == client.user:
             return
         msgSplit = message.content.split()
-        if msgSplit[0].lower() =="fleabot":
-            if len(msgSplit)!=1:
-                await handleMsg(message,msgSplit)
-            else:
-                await message.channel.send("Please enter an item name after Fleabot")
-        if msgSplit[0].lower() =="ping":
-            if len(msgSplit)!=1:
-                await ping(message,msgSplit, pingCounter)
-            else:
-                await message.channel.send("Invalid input please use this format: Ping *item name* < or > *price* for example: Ping Metal Fuel < 1000")
-        if msgSplit[0].lower() =="help":
-            await message.channel.send("Fleabot is a bot that will ping you when an item reaches a certain price, and it can also tell you the price of an item on demand on the Flea Market. To use it type: \nFleabot *item*\nFor example: Fleabot Metal Fuel \nyou can also use the command \nPing *item name* < or > *price* \nFor example: Ping Metal Fuel < 1000")
+
+        if message.guild.id in tracked_servers:
+            if msgSplit[0].lower() =="fleabot":
+                if len(msgSplit)!=1:
+                    await handleMsg(message,msgSplit)
+                else:
+                    await message.channel.send("Please enter an item name after Fleabot")
+            if msgSplit[0].lower() =="ping":
+                if len(msgSplit)!=1:
+                    await ping(message,msgSplit, pingCounter)
+                else:
+                    await message.channel.send("Invalid input please use this format: Ping *item name* < or > *price* for example: Ping Metal Fuel < 1000")
+            if msgSplit[0].lower() =="help":
+                await message.channel.send("Fleabot is a bot that will ping you when an item reaches a certain price, and it can also tell you the price of an item on demand on the Flea Market. To use it type: \nFleabot *item*\nFor example: Fleabot Metal Fuel \nyou can also use the command \nPing *item name* < or > *price* \nFor example: Ping Metal Fuel < 1000")
 
 #Add your discord bot token    
 client.run('---YOUR TOKEN HERE---')
