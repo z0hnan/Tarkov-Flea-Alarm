@@ -3,6 +3,7 @@ import discord
 import datetime
 import asyncio
 import requests
+import json
 
 #Declare variable so it isn't null
 input = ""
@@ -48,23 +49,44 @@ async def ping(message,msgSplit, pingCounter):
     }}
     """
     result = run_query(new_query)
-    response = str(result)
-    responseSplit =response.split()
-    reversedList = []
-    for x in responseSplit:
-        reversedList = [x] + reversedList
-    
+     
+    # Access the JSON response directly without replacing
+    items_list = result.get('data', {}).get('items', [])
+
+    # Initialize item_name with None
+    item_name = None
+    # Initialize flea_market_price with None
+    flea_market_price = None
+
+    # Check if the 'items' list is not empty
+    if items_list:
+        # Take the first item (assuming there's only one)
+        data = items_list[0]
+
+        # Extract the item name
+        item_name = data.get('name')
+
+        # Extract the price from the source 'fleaMarket'
+        flea_market_price = next(
+            (item.get('price') for item in data.get('sellFor', []) if item.get('source') == 'fleaMarket'),
+            None
+        )
+    if item_name is not None:
+        printName = item_name
+    else:
+        printName = input
+
     if msgSplit[len(nameList) + 1] == "<":
-        if float(reversedList[2][:-1]) < int(msgSplit[len(nameList) + 2]):
-            botResponse = str("<@" + str(message.author.id) + ">" + " The price on the Flea market for "+ input +" is now "+ (reversedList[2]))
+        if float(flea_market_price) < float(msgSplit[len(nameList) + 2]):
+            botResponse = str("<@" + str(message.author.id) + ">" + " The price on the Flea market for "+ printName +" is now "+ str(flea_market_price))
             await message.channel.send(botResponse)
         else:
             pingCounter = pingCounter + 1
             await asyncio.sleep(1800)
             await ping(message,msgSplit, pingCounter)
     elif msgSplit[len(nameList) + 1] == ">":
-        if float(reversedList[2][:-1]) > int(msgSplit[len(nameList) + 2]):
-            botResponse = str("<@" + str(message.author.id) + ">" + " The price on the Flea market for "+ input +" is now "+ (reversedList[2]))
+        if float(flea_market_price) > float(msgSplit[len(nameList) + 2]):
+            botResponse = str("<@" + str(message.author.id) + ">" + " The price on the Flea market for "+ printName +" is now "+ str(flea_market_price))
             await message.channel.send(botResponse)
         else:
             pingCounter = pingCounter + 1
@@ -78,46 +100,52 @@ async def ping(message,msgSplit, pingCounter):
 async def handleMsg(message,msgSplit):
     input =" ".join(msgSplit[1:])
     new_query = f"""
-    {{
-        items(name: "{input}") {{
-            name
-            sellFor {{
-                price
-                source
-            }}
+{{
+    items(name: "{input}"){{
+        name
+        sellFor{{
+            price
+            source
         }}
     }}
-    """
+}}
+"""
     result = run_query(new_query)
-    #Spaghetticode begins. Only god and i knew what this code meant when i wrote it, now only god knows
-    response = str(result)
-    responseSplit =response.split()
-    reversedList = []
-    nameList = []
-    for x in responseSplit:
-        reversedList = [x] + reversedList
-    #Tries gathering real name not typed input
-    if responseSplit[2] =="[{'name':":
-        #Still gathers even if the name is multiple words 
-        x=3
-        for x in range(3,10):
-            if responseSplit[x]=="'sellFor':":
-                break
-            else:
-                nameList.append(responseSplit[x])
-        #Sends message to discord with the real name
-        if reversedList[0] =="'fleaMarket'}]}]}}":
-            botResponse = str("The price on the Flea market for "+ " ".join(nameList) +" is "+ (reversedList[2]))
-            await message.channel.send(botResponse)
-        else:
-            await message.channel.send("That item is not on the Flea Market or a skill issue ocurred")
+     
+    # Access the JSON response directly without replacing
+    items_list = result.get('data', {}).get('items', [])
+
+    # Initialize item_name with None
+    item_name = None
+    # Initialize flea_market_price with None
+    flea_market_price = None
+
+    # Check if the 'items' list is not empty
+    if items_list:
+        # Take the first item (assuming there's only one)
+        data = items_list[0]
+
+        # Extract the item name
+        item_name = data.get('name')
+
+        # Extract the price from the source 'fleaMarket'
+        flea_market_price = next(
+            (item.get('price') for item in data.get('sellFor', []) if item.get('source') == 'fleaMarket'),
+            None
+        )
+    
+    #Tests if real name exists
+    if item_name is not None:
+        printName = item_name
     else:
-        #Sends message to discord with the input name
-        if reversedList[0] =="'fleaMarket'}]}]}}":
-            botResponse = str("The price on the Flea market for "+ input +" is "+ (reversedList[2]))
-            await message.channel.send(botResponse)
-        else:
-            await message.channel.send("That item is not on the Flea Market or a skill issue ocurred")
+        printName = input
+
+    #Sends message to discord
+    if flea_market_price is not None:
+        botResponse = str("The price on the Flea market for "+ printName +" is "+ str(flea_market_price))
+        await message.channel.send(botResponse)
+    else:
+        await message.channel.send("That item is not on the Flea Market or a skill issue ocurred")
 
 #On Log in
 @client.event
@@ -136,4 +164,4 @@ async def on_ready():
             await ping(message,msgSplit, pingCounter)
 
 #Add your discord bot token    
-client.run('---your token here---')
+client.run('MTE0NjAwMTI4NTY5MTIzMjI5Ng.GAodA7.AD2j28bwKzOLjQZX07oexw-xOPZqcPquzw4kXY')
