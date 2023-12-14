@@ -130,18 +130,20 @@ async def ping(message,msgSplit, pingCounter):
     if flea_market_price is None:
         await message.channel.send(f"{input} is not on the Flea Market or a skill issue ocurred. Please use this format: Ping *item name* < or > *price* for example: Ping Metal Fuel < 1000")
         return
-       
 
-    if msgSplit[len(msgSplit)-2] == "<":
-        if float(flea_market_price) < float(msgSplit[len(msgSplit)-1]):
+    operator = msgSplit[len(msgSplit)-2]   
+    targetPrice = msgSplit[len(msgSplit)-1]
+
+    if operator == "<":
+        if float(flea_market_price) < float(targetPrice):
             botResponse = str("<@" + str(message.author.id) + ">" + " The price on the Flea market for "+ printName +" is now "+ str(flea_market_price))
             await message.channel.send(botResponse)
         else:
             pingCounter = pingCounter + 1
             await asyncio.sleep(1800)
             await ping(message,msgSplit, pingCounter)
-    elif msgSplit[len(msgSplit)-2] == ">":
-        if float(flea_market_price) > float(msgSplit[len(msgSplit)-1]):
+    elif operator == ">":
+        if float(flea_market_price) > float(targetPrice):
             botResponse = str("<@" + str(message.author.id) + ">" + " The price on the Flea market for "+ printName +" is now "+ str(flea_market_price))
             await message.channel.send(botResponse)
         else:
@@ -173,6 +175,8 @@ async def on_ready():
                 await ping(message,msgSplit, pingCounter)
             else:
                 await message.channel.send("Invalid input please use this format: Ping *item name* < or > *price* for example: Ping Metal Fuel < 1000")
+        if msgSplit[0].lower() =="help":
+            await message.channel.send("Fleabot is a bot that will ping you when an item reaches a certain price, and it can also tell you the price of an item on demand on the Flea Market. To use it type: \nFleabot *item*\nFor example: Fleabot Metal Fuel \nyou can also use the command \nPing *item name* < or > *price* \nFor example: Ping Metal Fuel < 1000")
 
 #Add your discord bot token    
-client.run('MTE0NjAwMTI4NTY5MTIzMjI5Ng.G5GHeX.2oMrM-0QPm0ahmYWmuuqGcz86lS-o1Gy2nq6O8')
+client.run('---YOUR TOKEN HERE---')
