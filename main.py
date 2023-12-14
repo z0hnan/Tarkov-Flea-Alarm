@@ -84,6 +84,7 @@ async def ping(message,msgSplit, pingCounter):
         await myChannel.send(f'The ping limit has been reached for "{input}", the tracking limit is 48 hours')
         pingCounter = 0
         return
+    
     new_query = f"""
     {{
         items(name: "{input}") {{
@@ -171,11 +172,13 @@ async def on_ready():
         if message.guild.id in tracked_servers:
             if msgSplit[0].lower() =="fleabot":
                 if len(msgSplit)!=1:
+                    print(f"Command received: {message.content} from {message.guild.name}")
                     await handleMsg(message,msgSplit)
                 else:
                     await message.channel.send("Please enter an item name after Fleabot")
             if msgSplit[0].lower() =="ping":
                 if len(msgSplit)!=1:
+                    print(f"Command received: {message.content} from {message.guild.name}")
                     await ping(message,msgSplit, pingCounter)
                 else:
                     await message.channel.send("Invalid input please use this format: Ping *item name* < or > *price* for example: Ping Metal Fuel < 1000")
@@ -183,4 +186,4 @@ async def on_ready():
                 await message.channel.send("Fleabot is a bot that will ping you when an item reaches a certain price, and it can also tell you the price of an item on demand on the Flea Market. To use it type: \nFleabot *item*\nFor example: Fleabot Metal Fuel \nyou can also use the command \nPing *item name* < or > *price* \nFor example: Ping Metal Fuel < 1000")
 
 #Add your discord bot token    
-client.run('---YOUR TOKEN HERE---')
+client.run('--- YOUR TOKEN HERE ---')
