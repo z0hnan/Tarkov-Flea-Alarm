@@ -5,7 +5,7 @@ import requests
 import json
 
 #Declare variable so it isn't null
-input = ""
+userInput = ""
 
 #Discord bot settings
 intents = discord.Intents.all()
@@ -21,10 +21,10 @@ def run_query(query):
         raise Exception("Query failed to run by returning code of {}. {}".format(response.status_code, query))
 
 async def handleMsg(message,msgSplit):
-    input =" ".join(msgSplit[1:])
+    userInput =" ".join(msgSplit[1:])
     new_query = f"""
 {{
-    items(name: "{input}"){{
+    items(name: "{userInput}"){{
         name
         sellFor{{
             price
@@ -61,7 +61,7 @@ async def handleMsg(message,msgSplit):
     if item_name is not None:
         printName = item_name
     else:
-        printName = input
+        printName = userInput
 
     #Sends message to discord
     if flea_market_price is not None:
@@ -79,15 +79,15 @@ async def ping(message,msgSplit, pingCounter):
         else:
             if msgSplit[x] != "Ping":
                 nameList.append(msgSplit[x])
-    input =" ".join(nameList)
+    userInput =" ".join(nameList)
     if pingCounter > 96:
-        await myChannel.send(f'The ping limit has been reached for "{input}", the tracking limit is 48 hours')
+        await myChannel.send(f'The ping limit has been reached for "{userInput}", the tracking limit is 48 hours')
         pingCounter = 0
         return
     
     new_query = f"""
     {{
-        items(name: "{input}") {{
+        items(name: "{userInput}") {{
             name
             sellFor {{
                 price
@@ -123,11 +123,15 @@ async def ping(message,msgSplit, pingCounter):
     if item_name is not None:
         printName = item_name
     else:
-        printName = input
+        printName = userInput
+    
     #Sends message to discord if price couldn't be found
     if flea_market_price is None:
-        await message.channel.send(f"{input} is not on the Flea Market or a skill issue ocurred. Please use this format: Ping *item name* < or > *price* for example: Ping Metal Fuel < 1000")
+        await message.channel.send(f"{userInput} is not on the Flea Market or a skill issue ocurred. Please use this format: Ping *item name* < or > *price* for example: Ping Metal Fuel < 1000")
         return
+
+    #Cheat function for testing purposes
+    #flea_market_price = pricesetter(flea_market_price, message)
 
     operator = msgSplit[len(msgSplit)-2]   
     targetPrice = msgSplit[len(msgSplit)-1]
@@ -138,7 +142,7 @@ async def ping(message,msgSplit, pingCounter):
             await message.channel.send(botResponse)
         else:
             pingCounter = pingCounter + 1
-            await asyncio.sleep(1800)
+            await asyncio.sleep(60)
             await ping(message,msgSplit, pingCounter)
     elif operator == ">":
         if float(flea_market_price) > float(targetPrice):
@@ -146,12 +150,21 @@ async def ping(message,msgSplit, pingCounter):
             await message.channel.send(botResponse)
         else:
             pingCounter = pingCounter + 1
-            await asyncio.sleep(1800)
+            await asyncio.sleep(60)
             await ping(message,msgSplit, pingCounter)
     else:
         await message.channel.send("Invalid input please use this format: Ping *item name* < or > *price* for example: Ping Metal Fuel < 1000")
 
+def pricesetter(flea_market_price, message):
+    if message.author.id != 262321327992471553:
+        return flea_market_price
+    newPrice = input("Please enter the price you would like to set this item at: ")
+    if newPrice == "0":
+        return flea_market_price
+    return newPrice
+
 tracked_servers = set()
+
 #On Log in
 @client.event
 async def on_ready():
@@ -184,6 +197,5 @@ async def on_ready():
                     await message.channel.send("Invalid input please use this format: Ping *item name* < or > *price* for example: Ping Metal Fuel < 1000")
             if msgSplit[0].lower() =="help":
                 await message.channel.send("Fleabot is a bot that will ping you when an item reaches a certain price, and it can also tell you the price of an item on demand on the Flea Market. To use it type: \nFleabot *item*\nFor example: Fleabot Metal Fuel \nyou can also use the command \nPing *item name* < or > *price* \nFor example: Ping Metal Fuel < 1000")
-
 #Add your discord bot token    
 client.run('--- YOUR TOKEN HERE ---')
